@@ -20,7 +20,7 @@ ARG NB_GID="100"
 
 
 # Pull base image.
-FROM python:3.5-alpine
+# FROM python:3.5-alpine
 
 # Install Glances (develop branch)
 #RUN apk add --no-cache --virtual .build_deps \
