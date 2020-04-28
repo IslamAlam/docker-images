@@ -1,7 +1,6 @@
 #
 # Glances Dockerfile
 #
-# https://github.com/nicolargo/glances
 #
 # Copyright (c) Islam Mansour.
 # Distributed under the terms of the Modified BSD License.
@@ -9,13 +8,18 @@
 # Apline 3.11
 # https://github.com/alpinelinux/docker-alpine/blob/c5510d5b1d2546d133f7b0938690c3c1e2cd9549/x86_64/Dockerfile
 # OS/ARCH: linux/amd64, linux/386, linux/arm64, linux/ppc64le, linux/s390x, linux/arm/v7, linux/arm/v6
+ARG ARG_WORKSPACE_VERSION="3.1.4"
+ARG ARG_WORKSPACE_PATH="/glances"
+
 ARG ROOT_CONTAINER=python:3.7-alpine3.11
 ARG BASE_CONTAINER=$ROOT_CONTAINER
 FROM $BASE_CONTAINER AS builder
 
-ARG ARG_WORKSPACE_VERSION="unknown"
+ARG ARG_WORKSPACE_VERSION
+ARG ARG_WORKSPACE_PATH
+ARG ARG_BUILD_DATE
 ENV GLANCES_VERSION=$ARG_WORKSPACE_VERSION
-ENV GLANCES_PATH=/glances
+ENV GLANCES_PATH=$ARG_WORKSPACE_PATH
 
 RUN apk add --no-cache --virtual .build_deps \
     bash \
@@ -25,6 +29,7 @@ RUN apk add --no-cache --virtual .build_deps \
 	linux-headers \
     && export PIP_DEFAULT_NO_CACHE_DIR=true
 
+RUN echo $GLANCES_PATH
 RUN mkdir -p ${GLANCES_PATH}
 
 
@@ -50,8 +55,14 @@ RUN set -ex; \
 ############################
 FROM $BASE_CONTAINER
 
+ARG ARG_WORKSPACE_VERSION
+ARG ARG_WORKSPACE_PATH
+ARG ARG_BUILD_DATE="unknown"
+ENV GLANCES_VERSION=$ARG_WORKSPACE_VERSION
+ENV GLANCES_PATH=$ARG_WORKSPACE_PATH
+
 # Copy our static executable.
-COPY --from=builder /glances /glances
+COPY --from=builder /${GLANCES_PATH} /${GLANCES_PATH}
 #COPY --from=builder /usr/local/lib/python3.7/site-packages/ /usr/local/lib/python3.7/site-packages/
 COPY --from=builder /root/.local /root/.local
 # Make sure scripts in .local are usable:
@@ -60,8 +71,6 @@ ENV PATH=/root/.local/bin:$PATH
 RUN apk add --no-cache bash 
 
 ### END CONFIGURATION ### 
-ARG ARG_BUILD_DATE="unknown"
-ARG ARG_WORKSPACE_VERSION="unknown"
 ENV WORKSPACE_VERSION=$ARG_WORKSPACE_VERSION
 
 # Overwrite & add Labels
@@ -102,13 +111,18 @@ LABEL \
 # Define default command.
 # CMD python -m glances -C /glances/conf/glances.conf --quiet $GLANCES_OPT
 
+ENV GLANCES_PATH=$ARG_WORKSPACE_PATH
 # Define working directory.
-WORKDIR $GLANCES_PATH
+WORKDIR ${GLANCES_PATH}
+# Configuration volume
+VOLUME $GLANCES_PATH/conf
 
-# use global option with tini to kill full process groups: https://github.com/krallin/tini#process-group-killing
-ENTRYPOINT ["python", "-m", "glances"]
+# Command line options
+ENV GLANCES_OPT=-w
 
-CMD ["-C", "/glances/conf/glances.conf", "$GLANCES_OPT"] 
+# Define default command.
+CMD python -m glances -C /glances/conf/glances.conf $GLANCES_OPT
+
 
 # Port 61208 is the Web UI port
 # Port 61209 is the XMLRPC port
