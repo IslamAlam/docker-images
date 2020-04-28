@@ -33,11 +33,19 @@ jobs:
         uses: crazy-max/ghaction-docker-buildx@v1
         with:
           version: latest
+      - 
+        env:
+          DOCKER_HUB_USER: ${{ secrets.DOCKER_HUB_USER }
+          DOCKER_HUB_ACCESS_TOKEN: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }
       -
         name: Available platforms
         run: echo ${{ steps.buildx.outputs.platforms }}
 
     # Runs a set of commands using the runners shell
+      -
+         name: docker login
+         run: |
+           docker login --username DOCKER_HUB_USER --password DOCKER_HUB_ACCESS_TOKEN
       -
         name: Run Buildx
         run: |
