@@ -13,10 +13,8 @@ ARG ROOT_CONTAINER=python:3.7-alpine3.11
 ARG BASE_CONTAINER=$ROOT_CONTAINER
 FROM $BASE_CONTAINER AS builder
 
-LABEL maintainer="Islam Mansour <is3mansour@gmail.com>"
-
-
-ENV GLANCES_VERSION=3.1.4.1
+ARG ARG_WORKSPACE_VERSION="unknown"
+ENV GLANCES_VERSION=$ARG_WORKSPACE_VERSION
 ENV GLANCES_PATH=/glances
 
 RUN apk add --no-cache --virtual .build_deps \
@@ -61,11 +59,64 @@ ENV PATH=/root/.local/bin:$PATH
 
 RUN apk add --no-cache bash 
 
-# Define working directory.
-WORKDIR /glances
+### END CONFIGURATION ### 
+ARG ARG_BUILD_DATE="unknown"
+ARG ARG_WORKSPACE_VERSION="unknown"
+ENV WORKSPACE_VERSION=$ARG_WORKSPACE_VERSION
 
-# EXPOSE PORT (For Web UI & XMLRPC)
-EXPOSE 61208 61209
+# Overwrite & add Labels
+LABEL \
+    "maintainer"="is3mansour@gmail.com" \
+    "workspace.version"=$WORKSPACE_VERSION \
+    "workspace.flavor"=$WORKSPACE_FLAVOR \
+    # Kubernetes Labels
+    "io.k8s.description"="Glances is a cross-platform system monitoring tool written in Python." \
+    "io.k8s.display-name"="Glances - An Eye on your system" \
+    # Openshift labels: https://docs.okd.io/latest/creating_images/metadata.html
+    "io.openshift.expose-services"="61208:http, 61209:XMLRPC" \
+    "io.openshift.non-scalable"="true" \
+    "io.openshift.tags"="System, Monitoring, Glances" \
+    "io.openshift.min-memory"="3Mb" \
+    # Open Container labels: https://github.com/opencontainers/image-spec/blob/master/annotations.md
+    "org.opencontainers.image.title"="Glances - An Eye on your system" \
+    "org.opencontainers.image.description"="Glances is a cross-platform system monitoring tool written in Python." \
+    "org.opencontainers.image.documentation"="https://nicolargo.github.io/glances/" \
+    "org.opencontainers.image.url"="https://github.com/IslamAlam/docker-images" \
+    "org.opencontainers.image.source"="https://github.com/IslamAlam/docker-images" \
+    # "org.opencontainers.image.licenses"="Apache-2.0" \
+    "org.opencontainers.image.version"=$WORKSPACE_VERSION \
+    "org.opencontainers.image.vendor"="Islam Mansour" \
+    "org.opencontainers.image.authors"="Islam Mansour" \
+    "org.opencontainers.image.created"=$ARG_BUILD_DATE \ 
+    # Label Schema Convention (deprecated): http://label-schema.org/rc1/
+    "org.label-schema.name"="Glances - An Eye on your system" \
+    "org.label-schema.description"="Glances is a cross-platform system monitoring tool written in Python." \
+    "org.label-schema.usage"="https://nicolargo.github.io/glances/" \
+    "org.label-schema.url"="https://github.com/IslamAlam/docker-images" \
+    "org.label-schema.vcs-url"="https://github.com/IslamAlam/docker-images" \
+    "org.label-schema.vendor"="Islam Mansour" \
+    "org.label-schema.version"=$WORKSPACE_VERSION \
+    "org.label-schema.schema-version"="1.0" \
+    "org.label-schema.build-date"=$ARG_BUILD_DATE
 
 # Define default command.
-CMD python -m glances -C /glances/conf/glances.conf --quiet $GLANCES_OPT
+# CMD python -m glances -C /glances/conf/glances.conf --quiet $GLANCES_OPT
+
+# Define working directory.
+WORKDIR $GLANCES_PATH
+
+# use global option with tini to kill full process groups: https://github.com/krallin/tini#process-group-killing
+ENTRYPOINT ["python", "-m", "glances"]
+
+CMD ["-C", "/glances/conf/glances.conf", "$GLANCES_OPT"] 
+
+# Port 61208 is the Web UI port
+# Port 61209 is the XMLRPC port
+# See glances/conf/glances.conf for more ports
+
+# EXPOSE PORT (For XMLRPC)
+EXPOSE 61209
+
+# EXPOSE PORT (For Web UI)
+EXPOSE 61208
+###
