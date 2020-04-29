@@ -1,7 +1,6 @@
 #
 # Glances Dockerfile
 #
-#
 # Copyright (c) Islam Mansour.
 # Distributed under the terms of the Modified BSD License.
 
