@@ -39,3 +39,11 @@ Additional labels for pre-release and build metadata are available as extensions
 When Docker Cloud pulls a branch from a source code repository, it performs a shallow clone (only the tip of the specified branch). This has the advantage of minimizing the amount of data transfer necessary from the repository and speeding up the build because it pulls only the minimal code necessary.
 
 Because of this, in order to get the tags, a full "unshallow" clone needs to be fetched.  This can potentially take a very long time and transfers a lot of data depending on your repository.  It is not recommended to use these scripts on a large repository.  Sorry.
+
+Alpine available for arm32v6 and not for arm32v7, why ? #298
+https://github.com/gliderlabs/docker-alpine/issues/298
+
+https://github.com/gliderlabs/docker-alpine/blob/master/build
+
+docker-alpine/build
+https://github.com/ThomDietrich/miflora-mqtt-daemon/pull/59/files

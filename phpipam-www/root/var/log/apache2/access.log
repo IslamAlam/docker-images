@@ -1,0 +1,32 @@
+
+
+*
+* Visual Studio Code Server
+*
+* Reminder: You may only use this software with Visual Studio family products,
+* as described in the license https://aka.ms/vscode-remote/license
+*
+
+
+IP Address: 192.168.128.21
+IP Address: 172.17.0.1
+IP Address: 172.19.0.1
+IP Address: 172.20.0.1
+IP Address: 172.21.0.1
+IP Address: 172.33.1.1
+Extension host agent listening on 42001
+
+
+[21:29:39] Extension host agent started.
+[21:29:40] [127.0.0.1][4507617b][ManagementConnection] New connection established.
+[21:29:40] [127.0.0.1][65a6f73d][ExtensionHostConnection] New connection established.
+bash: cannot set terminal process group (-1): Inappropriate ioctl for device
+bash: no job control in this shell
+[21:29:40] [127.0.0.1][65a6f73d][ExtensionHostConnection] <4577> Launched Extension Host Process.
+[21:29:58] [File Watcher (chokidar)] Inotify limit reached (ENOSPC)
+%c[IPC Library: File Watcher (chokidar)] %cUnhandled Promise Rejection:  color: blue color:  TypeError: this._removeWatcher is not a function
+    at DirEntry.remove (/home/ubuntu/.vscode-server/bin/d69a79b73808559a91206d73d7717ff5f798f23c/node_modules/chokidar/index.js:161:14)
+%c[IPC Library: File Watcher (chokidar)] %cUnhandled Promise Rejection:  color: blue color:  TypeError: this._removeWatcher is not a function
+    at DirEntry.remove (/home/ubuntu/.vscode-server/bin/d69a79b73808559a91206d73d7717ff5f798f23c/node_modules/chokidar/index.js:161:14)
+[01:47:15] [127.0.0.1][4507617b][ManagementConnection] The client has reconnected.
+[01:47:19] [127.0.0.1][65a6f73d][ExtensionHostConnection] The client has reconnected.
